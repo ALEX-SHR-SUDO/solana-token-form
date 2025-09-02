@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Create Solana Token</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f7f7f7;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .form-box {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      width: 320px;
+    }
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    input, button {
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+    }
+    button {
+      background: #4CAF50;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #45a049;
+    }
+    .result {
+      margin-top: 15px;
+      font-size: 14px;
+      color: green;
+    }
+  </style>
+</head>
+<body>
+  <div class="form-box">
+    <h2>Create Solana Token</h2>
+    <form id="tokenForm">
+      <input type="text" id="name" placeholder="Token Name" required />
+      <input type="text" id="symbol" placeholder="Symbol (e.g. SOLX)" required />
+      <input type="number" id="supply" placeholder="Initial Supply" required />
+      <button type="submit">Create Token</button>
+    </form>
+    <div class="result" id="result"></div>
+  </div>
+
+  <script>
+    document.getElementById("tokenForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      
+      const name = document.getElementById("name").value;
+      const symbol = document.getElementById("symbol").value;
+      const supply = document.getElementById("supply").value;
+
+      try {
+        const res = await fetch("https://solana-token-api.onrender.com", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name, symbol, supply })
+        });
+
+        const data = await res.json();
+        document.getElementById("result").innerText =
+          data.success 
+            ? `✅ Token created! Address: ${data.mint}` 
+            : `❌ Error: ${data.error}`;
+      } catch (err) {
+        document.getElementById("result").innerText = "⚠️ Server error.";
+      }
+    });
+  </script>
+</body>
+</html>

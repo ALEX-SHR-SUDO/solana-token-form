@@ -1,23 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <title>Create Solana Token</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: #f7f7f7;
+      background: #f5f7fa;
       display: flex;
       justify-content: center;
       align-items: center;
       height: 100vh;
+      margin: 0;
     }
-    .form-box {
+    .container {
       background: white;
-      padding: 20px;
+      padding: 25px 30px;
       border-radius: 12px;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-      width: 320px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      width: 350px;
     }
     h2 {
       text-align: center;
@@ -27,9 +28,9 @@
       width: 100%;
       padding: 10px;
       margin: 8px 0;
-      border-radius: 6px;
+      font-size: 14px;
+      border-radius: 8px;
       border: 1px solid #ccc;
-      font-size: 16px;
     }
     button {
       background: #4CAF50;
@@ -42,18 +43,22 @@
     }
     .result {
       margin-top: 15px;
+      padding: 10px;
+      border-radius: 8px;
+      background: #f1f1f1;
+      word-break: break-word;
       font-size: 14px;
-      color: green;
     }
   </style>
 </head>
 <body>
-  <div class="form-box">
+  <div class="container">
     <h2>Create Solana Token</h2>
     <form id="tokenForm">
-      <input type="text" id="name" placeholder="Token Name" required />
-      <input type="text" id="symbol" placeholder="Symbol (e.g. SOLX)" required />
-      <input type="number" id="supply" placeholder="Initial Supply" required />
+      <input type="text" id="name" placeholder="Token Name" required>
+      <input type="text" id="symbol" placeholder="Token Symbol" required>
+      <input type="number" id="decimals" placeholder="Decimals (e.g. 9)" value="9" required>
+      <input type="number" id="supply" placeholder="Initial Supply" value="1000" required>
       <button type="submit">Create Token</button>
     </form>
     <div class="result" id="result"></div>
@@ -62,27 +67,35 @@
   <script>
     document.getElementById("tokenForm").addEventListener("submit", async (e) => {
       e.preventDefault();
-      
+
       const name = document.getElementById("name").value;
       const symbol = document.getElementById("symbol").value;
-      const supply = document.getElementById("supply").value;
+      const decimals = parseInt(document.getElementById("decimals").value);
+      const supply = parseInt(document.getElementById("supply").value);
 
       try {
-        const res = await fetch("https://solana-token-api.onrender.com", {
+        const response = await fetch("https://solana-token-api.onrender.com", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ name, symbol, supply })
+          body: JSON.stringify({ name, symbol, decimals, supply })
         });
 
-        const data = await res.json();
-        document.getElementById("result").innerText =
-          data.success 
-            ? `✅ Token created! Address: ${data.mint}` 
-            : `❌ Error: ${data.error}`;
+        const data = await response.json();
+        const resultDiv = document.getElementById("result");
+
+        if (data.success) {
+          resultDiv.innerHTML = `<strong>✅ Token created!</strong><br>
+            Mint Address: ${data.mintAddress}<br>
+            Owner Account: ${data.ownerAccount}`;
+        } else {
+          resultDiv.innerHTML = `<strong>❌ Error:</strong> ${data.error}`;
+        }
       } catch (err) {
         document.getElementById("result").innerText = "⚠️ Server error.";
+        console.error(err);
       }
     });
   </script>
 </body>
 </html>
+
